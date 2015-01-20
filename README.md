@@ -8,9 +8,9 @@ unbound is DNS cache Server
 
 ## sample
 
-c = Unbound.new
-c.resolv "forum.mruby.org"
-=> "176.34.60.232"
+c = Unbound.new  
+c.resolv "forum.mruby.org"  
+=> "176.34.60.232"  
 
 ## Requirement
 
