@@ -20,7 +20,7 @@ unbound & libunbound
 
 on your build_config.rb
 MRuby:Build.new do |conf|  
-conf.gem :github "KeizoBookman/mruby-unbound"  
+conf.gem :github => "KeizoBookman/mruby-unbound"  
 end  
   
 ## LICENSE
