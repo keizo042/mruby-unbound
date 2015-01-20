@@ -19,9 +19,12 @@ unbound & libunbound
 ## Install
 
 on your build_config.rb
+
+```ruby:build_config.rb
 MRuby:Build.new do |conf|  
 conf.gem :github "KeizoBookman/mruby-unbound"  
 end  
+```
   
 ## LICENSE
 
@@ -29,7 +32,7 @@ same mruby LICENSE. MITL
 
 ## AUTHOR
 
-[keizo](https://github.com/KeizoBookman]
+[keizo](https://github.com/KeizoBookman)
 
 
 ## Contact me
