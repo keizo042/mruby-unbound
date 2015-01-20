@@ -30,6 +30,7 @@ static mrb_value mrb_unbound_init(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data;
     ub_ctx * ctx;
+    mrb_int port=53;
 
     data = (mrb_unbound_data *)DATA_PTR(self);
     if(data){
@@ -38,6 +39,7 @@ static mrb_value mrb_unbound_init(mrb_state *mrb, mrb_value self)
 
     DATA_TYPE(self) = &mrb_unbound_data_type;
     DATA_PTR(self) = NULL;
+    mrb_get_args(mrb,"|i",&port);
 
     ctx = ub_ctx_create();
     if(!ctx)
@@ -71,31 +73,31 @@ static mrb_value mrb_ub_ctx_config(mrb_state *mrb, mrb_value self)
 }
 
 // fowrder setting
-static mrb_value mrb_ub_ctx_set_Fwd(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_ub_ctx_set_fwd(mrb_state *mrb, mrb_value self)
 {
-    return self;
+    return mrb_false_value();
 }
 
 //config
 static mrb_value mrb_ub_ctx_resolvconf(mrb_state *mrb, mrb_value self)
 {
-    return self;
+    return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_hosts(mrb_state *mrb, mrb_value self)
 {
-    return self;
+    return mrb_fixnum_value(0);
 }
 
 
 static mrb_value mrb_ub_ctx_add_ta(mrb_state *mrb, mrb_value self)
 {
-    return self;
+    return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_add_ta_autr(mrb_state *mrb, mrb_value self)
 {
-    return self;
+    return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_add_ta_file(mrb_state *mrb, mrb_value self)
@@ -153,15 +155,15 @@ static mrb_value mrb_ub_resolve (mrb_state *mrb, mrb_value self)
     struct ub_result *result;
     struct in_addr *addr;
 
-    mrb_int rrtype;
+    mrb_int rrtype=1, rrclass=1;
     mrb_value val;
     char *name;
 
-    mrb_get_args(mrb,"Si",&val,&rrtype);
+    mrb_get_args(mrb,"S|ii",&val,&rrtype,&rrclass);
     data = (mrb_unbound_data*)DATA_PTR(self);
     ctx = data->ctx;
 
-    retval = ub_resolve(mrb,mrb_cstr_new_str(val),rrtype,1,&result);
+    retval = ub_resolve(mrb,mrb_cstr_new_str(val),rrtype,rrclass,&result);
     
     if(retval != 0)
     {
@@ -175,7 +177,6 @@ static mrb_value mrb_ub_resolve (mrb_state *mrb, mrb_value self)
 
     addr = (struct in_addr*)malloc( sizeof(struct in_addr) );
     addr = (struct in_addr*)result->data[0];
-    inet_ntoa(*addr);
 
     return mrb_str_new_cstr( inet_ntoa(*addr) );
 }
@@ -214,12 +215,14 @@ static mrb_value mrb_ub_cancel (mrb_state *mrb, mrb_value self)
     return mrb_nil_value();
 }
 
+//low priority
 static mrb_value mrb_ub_ctx_print_local_zones (mrb_state *mrb, mrb_value self)
 {
 
     return mrb_nil_value();
 }
 
+//low priority
 static mrb_value mrb_ub_ctx_zone_add (mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data;
@@ -240,14 +243,14 @@ static mrb_value mrb_ctx_zone_remove (mrb_state *mrb, mrb_value self)
 
 void mrb_mruby_unbound_gem_init(mrb_state *mrb)
 {
-    struct RClass *unbound;
-    unbound = mrb_define_class(mrb,"Unbound",mrb->object_class);
+    struct RClass *unbound = mrb_define_class(mrb,"Unbound",mrb->object_class);
+
     mrb_define_method(mrb,unbound,"initalize",mrb_unbound_init,MRB_ARGS_ARG(1,1));
     mrb_define_method(mrb,unbound,"resolv",mrb_ub_resolve,MRB_ARGS_ARG(1,2));
-    mrb_define_method(mrb,unbound,"fd",mrb_ub_fd,MRB_ARGS_);
-    mrb_define_method(mrb,unbound,"async",mrb_ub_ctx_async,MRB_ARGS_ARG(1,3));
-    mrb_define_method(mrb,unbound,"resolvconf",mrb_ub_ctx_resolvconf,MRB_ARGS_REQ(1));
-    mrb_define_method(mrb,unbound,"hosts",mrb_ub_ctx_hosts,MRB_ARGS_REQ(1));
+//    mrb_define_method(mrb,unbound,"fd",mrb_ub_fd,MRB_ARGS_);
+//    mrb_define_method(mrb,unbound,"async",mrb_ub_ctx_async,MRB_ARGS_ARG(1,3));
+//    mrb_define_method(mrb,unbound,"resolvconf",mrb_ub_ctx_resolvconf,MRB_ARGS_REQ(1));
+//    mrb_define_method(mrb,unbound,"hosts",mrb_ub_ctx_hosts,MRB_ARGS_REQ(1));
 }
 
 void mrb_mruby_unbound_gem_final(mrb_state *mrb)
