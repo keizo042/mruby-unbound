@@ -10,17 +10,18 @@ unbound is DNS cache Server
 
 c = Unbound.new
 c.resolv "forum.mruby.org"
-#=> "176.34.60.232"
+=> "176.34.60.232"
 
 ## Requirement
 
-your env is installed unbound / libunbound
+unbound & libunbound
 
 ## Install
 
 on your build_config.rb
-
-gem.config :github "KeizoBookman/mruby-unbound"
+MRuby:Build.new do |conf|
+conf.gem :github "KeizoBookman/mruby-unbound"
+end
 
 ## LICENSE
 
