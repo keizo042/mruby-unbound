@@ -17,12 +17,12 @@ typedef struct {
 }mrb_unbound_data;
 
 static const mrb_data_type mrb_unbound_data_type = {
-    "mrb_unbound_data", mrb_unbound_ctx_free,
+    "mrb_unbound_data", mrb_unbound_ctx_free
 }
 }
 static void mrb_unbound_ctx_free(mrb_state *mrb, void *p)
 {
-    mrb_unbound_ctx * ctx = (mrb_unbound_ctx *)p;
+    mrb_unbound_ctx *ctx = (mrb_unbound_ctx *)p;
     ub_ctx_delete(ctx);
 }
 
@@ -49,12 +49,16 @@ static mrb_value mrb_unbound_init(mrb_state *mrb, mrb_value self)
     data =(mrb_unbound_data *)mrb_malloc(mrb, sizeof(mrb_unbound_data) );
     data->ctx = ctx;
     DATA_PTR(self) = data;
-    return self
+    return self;
 }
 
 // power user option. low priority
 static mrb_value mrb_ub_ctx_set_option(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *data;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
 
     return self;
 }
@@ -62,6 +66,10 @@ static mrb_value mrb_ub_ctx_set_option(mrb_state *mrb, mrb_value self)
 //power user potion. low priority
 static mrb_ub_get_option(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
 
     return self;
 }
@@ -69,86 +77,154 @@ static mrb_ub_get_option(mrb_state *mrb, mrb_value self)
 // power user option. low priority
 static mrb_value mrb_ub_ctx_config(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return self;
 }
 
 // fowrder setting
 static mrb_value mrb_ub_ctx_set_fwd(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_false_value();
 }
 
 //config
 static mrb_value mrb_ub_ctx_resolvconf(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_hosts(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_fixnum_value(0);
 }
 
 
 static mrb_value mrb_ub_ctx_add_ta(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
+
     return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_add_ta_autr(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_fixnum_value(0);
 }
 
 static mrb_value mrb_ub_ctx_add_ta_file(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_nil_value;
 }
 
 // low priorty
 static  mrb_valuemrb_ub_ctx_trustedkeys(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_nil_value();
 }
 //low priority
 static mrb_value mrb_ub_ctx_debugout(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_nil_value();
 }
 
 // developer api
 static mrb_value mrb_ub_ctx_debuglevel(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_nil_value();
 }
 
 // absolutely need
 static mrb_value mrb_ub_ctx_async(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_fixnum_value(0);
 }
 
 // absolutely need
 static mrb_value mrb_ub_poll(mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     return mrb_nil_value();
 }
 
 // absolutely need
 static mrb_value mrb_ub_fd(mrb_state *mrb, mrb_value self)
 {
-    return mrb_fixnum_value(0);
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    struct *ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    int fd;
+    ctx = data->ctx;
+    fd = ub_fd(ctx);
+
+
+    return mrb_fixnum_value(fd);
 }
 
 // absolutely need
 static mrb_value mrb_ub_process(mrb_state *mrb, mrb_value self)
 {
-    return mrb_fixnum_value(0);
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    int num;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
+    num = ub_process(ctx);
+    return mrb_fixnum_value(num);
 }
 
 // absolutely need
 static mrb_value mrb_ub_resolve (mrb_state *mrb, mrb_value self)
 {
+    mrb_unbound_data *data;
+    ub_ctx *ctx;
+    data = (mrb_unbound_data *)DATA_PTR(self);
+    ctx = data->ctx;
     int retval;
     mrb_unbound_data *data;
     struct ub_ctx *ctx;
@@ -158,7 +234,6 @@ static mrb_value mrb_ub_resolve (mrb_state *mrb, mrb_value self)
     mrb_int rrtype=1, rrclass=1;
     mrb_value val;
     char *name;
-
     mrb_get_args(mrb,"S|ii",&val,&rrtype,&rrclass);
     data = (mrb_unbound_data*)DATA_PTR(self);
     ctx = data->ctx;
@@ -202,7 +277,7 @@ static mrb_value mrb_resolv_async (mrb_state *mrb, mrb_value self)
 
 
     
-    return mrb_str_new_cstr();
+    return mrb_str_new_cstr("");
 }
 
 static mrb_value mrb_ub_cancel (mrb_state *mrb, mrb_value self)
@@ -246,8 +321,8 @@ void mrb_mruby_unbound_gem_init(mrb_state *mrb)
     struct RClass *unbound = mrb_define_class(mrb,"Unbound",mrb->object_class);
 
     mrb_define_method(mrb,unbound,"initalize",mrb_unbound_init,MRB_ARGS_ARG(1,1));
-    mrb_define_method(mrb,unbound,"resolv",mrb_ub_resolve,MRB_ARGS_ARG(1,2));
-//    mrb_define_method(mrb,unbound,"fd",mrb_ub_fd,MRB_ARGS_);
+    mrb_define_method(mrb,unbound,"resolve",mrb_ub_resolve,MRB_ARGS_ARG(1,2));
+    mrb_define_method(mrb,unbound,"fd",mrb_ub_fd,MRB_ARGS_NONE);
 //    mrb_define_method(mrb,unbound,"async",mrb_ub_ctx_async,MRB_ARGS_ARG(1,3));
 //    mrb_define_method(mrb,unbound,"resolvconf",mrb_ub_ctx_resolvconf,MRB_ARGS_REQ(1));
 //    mrb_define_method(mrb,unbound,"hosts",mrb_ub_ctx_hosts,MRB_ARGS_REQ(1));
