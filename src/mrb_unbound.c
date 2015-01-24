@@ -9,50 +9,52 @@
 #include "mruby/string.h"
 #include "mruby/value.h"
 #include "mrb_unbound.h"
-#include<stdlib.h>
 #include <unbound.h>
+#include <string.h>
+#include <stdlib.h>
 #include <arpa/inet.h>
 
+#define ADDR_LEN 37
 typedef struct {
     struct ub_ctx *ctx;
 }mrb_unbound_data;
 
-static void mrb_unbound_ctx_free(mrb_state *mrb, void *p);
+static void mrb_unbound_data_free(mrb_state *mrb, void *p);
     
 static const mrb_data_type mrb_unbound_data_type = {
-    "mrb_unbound_data", mrb_unbound_ctx_free
+    "mrb_unbound_data", mrb_unbound_data_free
 };
 
-static void mrb_unbound_ctx_free(mrb_state *mrb, void *p)
+static void mrb_unbound_data_free(mrb_state *mrb, void *p)
 {
     mrb_unbound_data *data = (mrb_unbound_data *)p;
     ub_ctx_delete(data->ctx);
-    free(data);
+    mrb_free(mrb, data);
 }
 
 static mrb_value mrb_unbound_init(mrb_state *mrb, mrb_value self)
 {
-    mrb_unbound_data *data;
-    struct ub_ctx *ctx;
     mrb_int port=53;
+    mrb_unbound_data *data = (mrb_unbound_data *)DATA_PTR(self);
+    struct ub_ctx *ctx;
 
-    data = (mrb_unbound_data *)DATA_PTR(self);
-    if(data){
-        mrb_free(mrb,ctx);
-    }
-
-    DATA_TYPE(self) = &mrb_unbound_data_type;
-    DATA_PTR(self) = NULL;
     mrb_get_args(mrb,"|i",&port);
 
-    ctx = ub_ctx_create();
+    mrb_data_init(self, NULL, &mrb_unbound_data_type);
+
+    data =(mrb_unbound_data *)mrb_malloc(mrb, sizeof(mrb_unbound_data) );
+    ctx  = ub_ctx_create();
     if(!ctx)
     {
+        mrb_free(mrb, data);
         mrb_raisef(mrb, E_RUNTIME_ERROR, "libunbound error: %S", mrb_str_new_cstr(mrb, "could not create unbound context\n") );
     }
-    data =(mrb_unbound_data *)mrb_malloc(mrb, sizeof(mrb_unbound_data) );
+    if(data){
+        mrb_free(mrb, data);
+    }
     data->ctx = ctx;
-    DATA_PTR(self) = data;
+
+    mrb_data_init(self, data, &mrb_unbound_data_type);
     return self;
 }
 
@@ -185,29 +187,31 @@ static mrb_value mrb_ub_ctx_async(mrb_state *mrb, mrb_value self)
     ctx = data->ctx;
     return mrb_fixnum_value(0);
 }
+*/
 
 // absolutely need
 static mrb_value mrb_ub_poll(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data;
-    ub_ctx *ctx;
+    struct ub_ctx *ctx;
+    mrb_int poll;
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
-    return mrb_nil_value();
+    poll = ub_poll(ctx);
+    return mrb_fixnum_value(poll);
 }
-*/
 
 // absolutely need
 static mrb_value mrb_ub_fd(mrb_state *mrb, mrb_value self)
 {
-    mrb_unbound_data *data;
-    struct ub_ctx *ctx;
-    data = (mrb_unbound_data *)DATA_PTR(self);
-    int fd;
-    ctx = data->ctx;
-    fd = ub_fd(ctx);
+    mrb_unbound_data *data= (mrb_unbound_data *)DATA_PTR(self);
+    mrb_int fd;
+    if(data->ctx == NULL)
+    {
+        return mrb_nil_value();
+    }
 
-
+    fd = ub_fd(data->ctx);
     return mrb_fixnum_value(fd);
 }
 
@@ -216,47 +220,57 @@ static mrb_value mrb_ub_process(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data;
     struct ub_ctx *ctx;
-    int num;
+    mrb_int num;
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
+    if(ctx == NULL)
+    {
+        return mrb_nil_value();
+    }
     num = ub_process(ctx);
+    
     return mrb_fixnum_value(num);
 }
 
+
 // absolutely need
-static mrb_value mrb_ub_resolve (mrb_state *mrb, mrb_value self)
+static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data;
     struct ub_ctx *ctx;
-    data = (mrb_unbound_data *)DATA_PTR(self);
-    ctx = data->ctx;
     int retval;
     struct ub_result *result;
-    struct in_addr *addr;
+    struct in_addr addr;
+    mrb_int  rrtype=1, rrclass=1;
+    mrb_value val,qname;
+    char name[ADDR_LEN];
 
-    mrb_int rrtype=1, rrclass=1;
-    mrb_value val;
-    char *name;
-    mrb_get_args(mrb,"S|ii",&val,&rrtype,&rrclass);
-    data = (mrb_unbound_data*)DATA_PTR(self);
+    mrb_get_args(mrb,"S|ii",qname,&rrtype,&rrclass);
+
+    data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
+    if(ctx == NULL)
+    {
+        return mrb_nil_value();
+    }
 
-    retval = ub_resolve(ctx,RSTRING_PTR(val),rrtype,rrclass,&result);
+    retval = ub_resolve(ctx, mrb_str_to_cstr(mrb,qname), (int)rrtype, (int)rrclass, &result);
     
     if(retval != 0)
     {
         return mrb_nil_value();
     }
 
-    if(result->havedata)
+    if(!result->havedata)
     {
         return mrb_nil_value();
     }
 
-    addr = (struct in_addr*)malloc( sizeof(struct in_addr) );
-    addr = (struct in_addr*)result->data[0];
+    addr = *(struct in_addr*)result->data[0];
 
-    return mrb_str_new_cstr(mrb, inet_ntoa(*addr) );
+    strncpy( name, inet_ntoa(addr), ADDR_LEN);
+
+    return mrb_str_new(mrb, name, ADDR_LEN);
 }
 /*
 
@@ -323,14 +337,17 @@ static mrb_value mrb_ctx_zone_remove (mrb_state *mrb, mrb_value self)
 
 void mrb_mruby_unbound_gem_init(mrb_state *mrb)
 {
-    struct RClass *unbound = mrb_define_class(mrb,"Unbound",mrb->object_class);
+    struct RClass *unbound = mrb_define_class(mrb,  "Unbound",  mrb->object_class);
 
-    mrb_define_method(mrb,unbound,"initalize",mrb_unbound_init,MRB_ARGS_ARG(1,1));
-    mrb_define_method(mrb,unbound,"resolve",mrb_ub_resolve,MRB_ARGS_ARG(1,2));
-    mrb_define_method(mrb,unbound,"fd",mrb_ub_fd,MRB_ARGS_NONE());
-//    mrb_define_method(mrb,unbound,"async",mrb_ub_ctx_async,MRB_ARGS_ARG(1,3));
-//    mrb_define_method(mrb,unbound,"resolvconf",mrb_ub_ctx_resolvconf,MRB_ARGS_REQ(1));
-//    mrb_define_method(mrb,unbound,"hosts",mrb_ub_ctx_hosts,MRB_ARGS_REQ(1));
+    mrb_define_method(mrb,  unbound,    "initialize",    mrb_unbound_init,       MRB_ARGS_OPT(1)     );
+    mrb_define_method(mrb,  unbound,    "resolve",      mrb_ub_resolve,         MRB_ARGS_ARG(1,2)   );
+    mrb_define_method(mrb,  unbound,    "fd",           mrb_ub_fd,              MRB_ARGS_NONE()     );
+    mrb_define_method(mrb,  unbound,    "process",      mrb_ub_process,         MRB_ARGS_NONE()     );
+    mrb_define_method(mrb,  unbound,    "poll",         mrb_ub_poll,            MRB_ARGS_NONE()     );
+/*  mrb_define_method(mrb,  unbound,    "async",        mrb_ub_ctx_async,       MRB_ARGS_ARG(1,3)   );
+    mrb_define_method(mrb,  unbound,    "resolvconf",   mrb_ub_ctx_resolvconf,  MRB_ARGS_REQ(1)     );
+    mrb_define_method(mrb,  unbound,    "hosts",        mrb_ub_ctx_hosts,       MRB_ARGS_REQ(1)     );
+    */
 }
 
 void mrb_mruby_unbound_gem_final(mrb_state *mrb)
