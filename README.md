@@ -8,9 +8,11 @@ unbound is DNS cache Server
 
 ## sample
 
+```
 c = Unbound.new  
 c.resolv "forum.mruby.org"  
 => "176.34.60.232"  
+```
 
 ## Requirement
 
@@ -20,7 +22,7 @@ unbound & libunbound
 
 on your build_config.rb
 
-```ruby:build_config.rb
+```ruby:build_config.rb  
 MRuby:Build.new do |conf|  
 conf.gem :github => "KeizoBookman/mruby-unbound"  
 end  
