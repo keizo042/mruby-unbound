@@ -10,7 +10,7 @@ unbound is DNS cache Server
 
 ```
 c = Unbound.new  
-c.resolv "forum.mruby.org"  
+c.resolve "forum.mruby.org"  
 => "176.34.60.232"  
 ```
 

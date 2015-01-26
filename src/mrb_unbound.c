@@ -310,6 +310,7 @@ static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
 
     mrb_get_args(mrb,"S|ii",&qname,&rrtype,&rrclass);
     name= mrb_str_to_cstr(mrb, qname);
+    
 
     retval = ub_resolve(ctx, name, rrtype, rrclass, &result);
     if(retval != 0 || !result->havedata)
@@ -318,7 +319,7 @@ static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
     }
 
     addr = (struct in_addr*)result->data[0];
-    return mrb_str_new(mrb, inet_ntoa(*addr), ADDR_LEN);
+    return mrb_str_new_cstr(mrb, inet_ntoa(*addr));
 }
 /*
 
