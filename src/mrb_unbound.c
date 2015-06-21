@@ -65,7 +65,7 @@ static mrb_value mrb_ub_set_option(mrb_state *mrb, mrb_value self)
     int i;
     char *op,*v;
 
-    mrb_get_args(mrb,"S",&opt);
+    mrb_get_args(mrb,"Sz",&opt, &v);
     op = mrb_str_to_cstr(mrb, opt);
     i = ub_ctx_set_option(ctx, op, v);
 
@@ -80,12 +80,12 @@ static mrb_value mrb_ub_get_option(mrb_state *mrb, mrb_value self)
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
     mrb_value val;
-    char *opt, **v;
+    char *opt, *v;
     int i;
     mrb_get_args(mrb,"S",&val);
     opt = mrb_str_to_cstr(mrb,val);
 
-    i = ub_ctx_get_option(ctx,opt,v);
+    i = ub_ctx_get_option(ctx,opt,&v);
 
     return mrb_str_new(mrb,v,sizeof(v));;
 }
@@ -376,7 +376,7 @@ static mrb_value mrb_ub_ctx_zone_add (mrb_state *mrb, mrb_value self)
     mrb_unbound_data *data  = (mrb_unbound_data*)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
     mrb_value type, zname;
-    char *z,t;
+    char *z,*t;
     mrb_int i;
     mrb_get_args(mrb,"SS",&zname,&type);
     z = mrb_str_to_cstr(mrb,zname);
