@@ -107,7 +107,7 @@ static mrb_value mrb_ub_ctx_config(mrb_state *mrb, mrb_value self)
     i= ub_ctx_config(ctx, f);
 
     
-    return self;
+    return mrb_fixnum_value(i);
 }
 
 // fowrder setting
