@@ -417,7 +417,9 @@ void mrb_mruby_unbound_gem_init(mrb_state *mrb)
 /*  
  *  mrb_define_method(mrb,  unbound,    "async",        mrb_ub_ctx_async,       MRB_ARGS_ARG(1,3)   );
     */
-}
+
+    mrb_define_unbound_result(mrb);
+ }
 
 void mrb_mruby_unbound_gem_final(mrb_state *mrb)
 {
