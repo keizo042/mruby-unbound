@@ -61,13 +61,11 @@ static mrb_value mrb_ub_set_option(mrb_state *mrb, mrb_value self)
     struct ub_ctx *ctx;
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
-    mrb_value opt;
     int i;
-    char *op,*v;
+    char *opt,*v;
 
-    mrb_get_args(mrb,"Sz",&opt, &v);
-    op = mrb_str_to_cstr(mrb, opt);
-    i = ub_ctx_set_option(ctx, op, v);
+    mrb_get_args(mrb,"zz",&opt, &v);
+    i = ub_ctx_set_option(ctx, opt, v);
 
     return mrb_str_new(mrb,v,sizeof(v));
 }
@@ -79,15 +77,13 @@ static mrb_value mrb_ub_get_option(mrb_state *mrb, mrb_value self)
     struct ub_ctx *ctx;
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
-    mrb_value val;
     char *opt, *v;
     int i;
-    mrb_get_args(mrb,"S",&val);
-    opt = mrb_str_to_cstr(mrb,val);
+    mrb_get_args(mrb,"z",&opt);
 
     i = ub_ctx_get_option(ctx,opt,&v);
 
-    return mrb_str_new(mrb,v,sizeof(v));;
+    return mrb_str_new_cstr(mrb,v);
 }
 
 // power user option. low priority
@@ -96,15 +92,13 @@ static mrb_value mrb_ub_ctx_config(mrb_state *mrb, mrb_value self)
     mrb_unbound_data *data;
     struct ub_ctx *ctx;
     data = (mrb_unbound_data *)DATA_PTR(self);
-    mrb_value fname;
     int i;
-    char *f;
+    char *file;
     ctx = data->ctx;
 
-    mrb_get_args(mrb,"S",&fname);
+    mrb_get_args(mrb,"z",&file);
 
-    f = mrb_str_to_cstr(mrb, fname); 
-    i= ub_ctx_config(ctx, f);
+    i= ub_ctx_config(ctx, file);
 
     
     return mrb_fixnum_value(i);
@@ -116,14 +110,12 @@ static mrb_value mrb_ub_ctx_set_fwd(mrb_state *mrb, mrb_value self)
     mrb_unbound_data *data=(mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx;
     int i;
-    char *p;
-    mrb_value arg;
+    char *arg;
     ctx = data->ctx;
 
-    mrb_get_args(mrb,"S",&arg);
-    p = mrb_str_to_cstr(mrb,arg);
+    mrb_get_args(mrb,"z",&arg);
 
-    i = ub_ctx_set_fwd(ctx, p);
+    i = ub_ctx_set_fwd(ctx, arg);
     return mrb_fixnum_value(i);
 }
 
@@ -133,14 +125,11 @@ static mrb_value mrb_ub_ctx_resolvconf(mrb_state *mrb, mrb_value self)
     mrb_unbound_data *data;
     data = (mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value fname;
     mrb_int i;
-    char *f =NULL;
-
+    char *fname =NULL;
     mrb_get_args(mrb,"S",&fname);
-    f = mrb_str_to_cstr(mrb,fname);
 
-    i = ub_ctx_resolvconf(ctx, f);
+    i = ub_ctx_resolvconf(ctx, fname);
     return mrb_fixnum_value(i);
 }
 
@@ -148,14 +137,12 @@ static mrb_value mrb_ub_ctx_hosts(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data = (mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value fname;
-    char *f=NULL;
+    char *fname=NULL;
     mrb_int i;
 
-    mrb_get_args(mrb,"S",&fname);
-    f = mrb_str_to_cstr(mrb, fname);
+    mrb_get_args(mrb,"z",&fname);
 
-    i = ub_ctx_hosts(ctx,f);
+    i = ub_ctx_hosts(ctx,fname);
 
     return mrb_fixnum_value(i);
 }
@@ -165,14 +152,12 @@ static mrb_value mrb_ub_ctx_add_ta(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data = (mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value s;
     mrb_int i;
-    char *p;
+    char *s;
 
-    mrb_get_args(mrb,"S",&s);
-    p = mrb_str_to_cstr(mrb, s);
+    mrb_get_args(mrb,"z",&s);
 
-    i = ub_ctx_add_ta(ctx, p);
+    i = ub_ctx_add_ta(ctx, s);
 
     return mrb_fixnum_value(i);
 }
@@ -181,12 +166,10 @@ static mrb_value mrb_ub_ctx_add_ta_autr(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data = (mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value v;
     char *p;
     mrb_int i;
 
-    mrb_get_args(mrb,"S", &v);
-    p = mrb_str_to_cstr(mrb,v);
+    mrb_get_args(mrb,"z", &p);
 
     i = ub_ctx_add_ta_autr(ctx ,p);
     return mrb_fixnum_value(i);
@@ -196,12 +179,10 @@ static mrb_value mrb_ub_ctx_add_ta_file(mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data = (mrb_unbound_data *)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value v;
     char *p=NULL;
     mrb_int i;
 
-    mrb_get_args(mrb,"S", &v);
-    p = mrb_str_to_cstr(mrb,v);
+    mrb_get_args(mrb,"z", &p);
 
     i = ub_ctx_add_ta_file(ctx, p);
     return mrb_fixnum_value(i);
@@ -214,14 +195,13 @@ static mrb_value mrb_ub_ctx_trustedkeys(mrb_state *mrb, mrb_value self)
     struct ub_ctx *ctx;
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
-    mrb_value fname;
-    char *f=NULL;
+    char *fname = NULL;
     int i=0;
 
     mrb_get_args(mrb,"S",&fname);
-    f = mrb_str_to_cstr(mrb,fname);
 
-    i = ub_ctx_trustedkeys(ctx,f);
+    i = ub_ctx_trustedkeys(ctx,fname);
+
     return mrb_true_value();
 }
 /*
@@ -305,11 +285,9 @@ static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
     struct in_addr *addr;
     int retval;
     mrb_int  rrtype=1, rrclass=1;
-    mrb_value val,qname;
     char *name;
 
-    mrb_get_args(mrb,"S|ii",&qname,&rrtype,&rrclass);
-    name= mrb_str_to_cstr(mrb, qname);
+    mrb_get_args(mrb,"z|ii",&name,&rrtype,&rrclass);
     
 
     retval = ub_resolve(ctx, name, rrtype, rrclass, &result);
@@ -355,7 +333,7 @@ static mrb_value mrb_ub_cancel (mrb_state *mrb, mrb_value self)
     mrb_int i, number=0;
     mrb_get_args(mrb,"i",&number);
 
-    i =ub_cancel(ctx,number);
+    i = ub_cancel(ctx,number);
     return mrb_fixnum_value(i);
 }
 
@@ -375,15 +353,12 @@ static mrb_value mrb_ub_ctx_zone_add (mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data  = (mrb_unbound_data*)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value type, zname;
-    char *z,*t;
+    char* type, zname;
     mrb_int i;
-    mrb_get_args(mrb,"SS",&zname,&type);
-    z = mrb_str_to_cstr(mrb,zname);
-    t = mrb_str_to_cstr(mrb, type);
+    mrb_get_args(mrb,"zz",&zname,&type);
     
 
-    i= ub_ctx_zone_add(ctx, z, t);
+    i = ub_ctx_zone_add(ctx, zname, tname);
 
     return mrb_fixnum_value(i);
 }
@@ -392,12 +367,10 @@ static mrb_value mrb_ub_ctx_zone_remove (mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data  = (mrb_unbound_data*)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    mrb_value d;
     mrb_int i;
     char *p;
 
-    mrb_get_args(mrb,"S",&d);
-    p = mrb_str_to_cstr(mrb, d);
+    mrb_get_args(mrb,"z",&p);
     i = ub_ctx_zone_remove(ctx, p);
     return mrb_fixnum_value(i);
 }
