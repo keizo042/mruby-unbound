@@ -60,7 +60,7 @@ mrb_value mrb_result_iv_set(mrb_state *mrb, mrb_value self, struct ub_result *re
     }
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, "data"),         data);
 
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, "answer"),       mrb_str_new(mrb, result->answer_packet, result->answer_len));
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, "answer"),       mrb_str_new(mrb, result->answer_packet, result->answer_len * sizeof(char)));
 
     return self;
 }
