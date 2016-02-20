@@ -9,11 +9,17 @@
 #include "mruby/string.h"
 #include "mruby/class.h"
 #include "mruby/value.h"
+#include "mruby/array.h"
+
 #include "mrb_unbound.h"
+#include "mrb_result.h"
+
 #include <unbound.h>
 #include <string.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
+
+
 
 #define ADDR_LEN 37
 typedef struct {
@@ -283,9 +289,11 @@ static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
     struct ub_ctx *ctx = data->ctx;
     struct ub_result *result;
     struct in_addr *addr;
-    int retval;
+    mrb_int retval;
     mrb_int  rrtype=1, rrclass=1;
+    mrb_value resobj;
     char *name;
+    struct RClass *result_class, *unbound_class;
 
     mrb_get_args(mrb,"z|ii",&name,&rrtype,&rrclass);
     
@@ -296,8 +304,12 @@ static mrb_value mrb_ub_resolve(mrb_state *mrb, mrb_value self)
         return mrb_nil_value();
     }
 
-    addr = (struct in_addr*)result->data[0];
-    return mrb_str_new_cstr(mrb, inet_ntoa(*addr));
+    unbound_class = mrb_class_get(mrb, "Unbound");
+    result_class = mrb_class_get_under(mrb, unbound_class, "Result");
+
+    resobj = mrb_obj_new(mrb, result_class, 0, NULL);
+
+    return mrb_result_iv_set(mrb, resobj, result);
 }
 /*
 
