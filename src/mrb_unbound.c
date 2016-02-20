@@ -137,7 +137,7 @@ static mrb_value mrb_ub_ctx_resolvconf(mrb_state *mrb, mrb_value self)
     mrb_int i;
     char *f =NULL;
 
-    mrb_get_args(mrb,"S",fname);
+    mrb_get_args(mrb,"S",&fname);
     f = mrb_str_to_cstr(mrb,fname);
 
     i = ub_ctx_resolvconf(ctx, f);
@@ -338,7 +338,7 @@ static mrb_value mrb_resolv_async (mrb_state *mrb, mrb_value self)
     data = (mrb_unbound_data *)DATA_PTR(self);
     ctx = data->ctx;
 
-    mrb_get_args(mrb,"Si",str,&rrtype);
+    mrb_get_args(mrb,"Si",&str,&rrtype);
 
     ub_resolve_async(ctx, str, rrtype, 1, MYDATA, , NULL);
 
@@ -396,7 +396,7 @@ static mrb_value mrb_ub_ctx_zone_remove (mrb_state *mrb, mrb_value self)
     mrb_int i;
     char *p;
 
-    mrb_get_args(mrb,"S",d);
+    mrb_get_args(mrb,"S",&d);
     p = mrb_str_to_cstr(mrb, d);
     i = ub_ctx_zone_remove(ctx, p);
     return mrb_fixnum_value(i);
