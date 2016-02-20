@@ -353,12 +353,12 @@ static mrb_value mrb_ub_ctx_zone_add (mrb_state *mrb, mrb_value self)
 {
     mrb_unbound_data *data  = (mrb_unbound_data*)DATA_PTR(self);
     struct ub_ctx *ctx = data->ctx;
-    char* type, zname;
+    char* type, *zname;
     mrb_int i;
     mrb_get_args(mrb,"zz",&zname,&type);
     
 
-    i = ub_ctx_zone_add(ctx, zname, tname);
+    i = ub_ctx_zone_add(ctx, zname, type);
 
     return mrb_fixnum_value(i);
 }
