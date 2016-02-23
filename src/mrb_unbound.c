@@ -390,9 +390,15 @@ static mrb_value mrb_ub_ctx_zone_remove (mrb_state *mrb, mrb_value self)
 
 void mrb_mruby_unbound_gem_init(mrb_state *mrb)
 {
-    struct RClass *unbound ;
+    struct RClass *unbound, *type, *class ;
     unbound = mrb_define_class(mrb, "Unbound",  mrb->object_class);
     MRB_SET_INSTANCE_TT(unbound, MRB_TT_DATA);
+
+    type = mrb_define_class_under(mrb, unbound, "Type", mrb->object_class);
+    MRB_SET_INSTANCE_TT(type, MRB_TT_DATA);
+
+    class = mrb_define_class_under(mrb, unbound, "Class", mrb->object_class);
+    MRB_SET_INSTANCE_TT(class, MRB_TT_DATA);
 
     mrb_define_method(mrb,  unbound,    "initialize",   mrb_unbound_init,       MRB_ARGS_NONE()     );
     mrb_define_method(mrb,  unbound,    "resolve",      mrb_ub_resolve,         MRB_ARGS_ARG(1,2)   );
@@ -414,9 +420,23 @@ void mrb_mruby_unbound_gem_init(mrb_state *mrb)
     mrb_define_method(mrb,  unbound,    "print_local_zones",      mrb_ub_ctx_print_local_zones,         MRB_ARGS_NONE()     );
     mrb_define_method(mrb,  unbound,    "zone_add",       mrb_ub_ctx_zone_add,         MRB_ARGS_REQ(2)     );
     mrb_define_method(mrb,  unbound,    "zone_remove",       mrb_ub_ctx_zone_remove,         MRB_ARGS_REQ(1)     );
-/*  
- *  mrb_define_method(mrb,  unbound,    "async",        mrb_ub_ctx_async,       MRB_ARGS_ARG(1,3)   );
-    */
+
+    /*  
+     *  mrb_define_method(mrb,  unbound,    "async",        mrb_ub_ctx_async,       MRB_ARGS_ARG(1,3)   );
+     */
+
+
+    mrb_define_const(mrb, type, "A", mrb_fixnum_value(1));
+    mrb_define_const(mrb, type, "NS", mrb_fixnum_value(2));
+    mrb_define_const(mrb, type, "CNAME", mrb_fixnum_value(5));
+    mrb_define_const(mrb, type, "SOA", mrb_fixnum_value(6));
+    mrb_define_const(mrb, type, "PTR", mrb_fixnum_value(12));
+    mrb_define_const(mrb, type, "HINFO", mrb_fixnum_value(13));
+    mrb_define_const(mrb, type, "MX", mrb_fixnum_value(15));
+    mrb_define_const(mrb, type, "TXT", mrb_fixnum_value(16));
+    mrb_define_const(mrb, type, "AAAA", mrb_fixnum_value(28));
+
+    mrb_define_const(mrb, class, "IN", mrb_fixnum_value(1));
 
     mrb_define_unbound_result(mrb);
  }
