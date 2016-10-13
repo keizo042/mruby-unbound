@@ -24,7 +24,7 @@ on your build_config.rb
 
 ```ruby:build_config.rb  
 MRuby:Build.new do |conf|  
-conf.gem :github => "KeizoBookman/mruby-unbound"  
+conf.gem :github => "keizo042/mruby-unbound"  
 end  
 ```
   
@@ -34,9 +34,9 @@ same mruby LICENSE. MITL
 
 ## AUTHOR
 
-[keizo](https://github.com/KeizoBookman)
+[keizo](https://github.com/keizo042)
 
 
 ## Contact me
-twitter : @keizo_bookman  
+twitter : @keizo042  
 mail: keizo.bookman at gmail.com  
